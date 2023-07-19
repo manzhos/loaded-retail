@@ -12,7 +12,7 @@ const config = {
   // URL: 'http://localhost:3000/',
   
   //production
-  API_URL: 'http://195.110.59.101:3300/',
+  API_URL: 'http://195.110.59.101/',
   URL:     'http://195.110.59.101/',
   
   MONTH: [
