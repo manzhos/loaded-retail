@@ -6,14 +6,14 @@ const config = {
   fontFamily: `'Roboto', sans-serif`,
   borderRadius: 12,
 
-  API_URL: 'http://localhost:3300/',
+  // dev
+  // API_URL: 'http://localhost:3300/',
   // AUTH_URL: 'https://localhost:3000/auth/',
-  URL: 'http://localhost:3000/',
+  // URL: 'http://localhost:3000/',
   
   //production
-  // export const API_URL  = 'https://---.com/',
-  // export const AUTH_URL = 'https://---.com/auth/',
-  // export const URL      = 'https://---.com/',
+  API_URL: 'http://195.110.59.101:3300/',
+  URL:     'http://195.110.59.101/',
   
   MONTH: [
     'Jan',
