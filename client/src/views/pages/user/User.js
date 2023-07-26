@@ -42,7 +42,8 @@ const TABLE_HEAD = [
   { id: 'name',   label: 'Name',    alignRight: false },
   { id: 'email',  label: 'Email',   alignRight: false },
   { id: 'phone',  label: 'Phone',   alignRight: false },
-  { id: 'role',   label: 'Role',  alignRight: false },
+  { id: 'role',   label: 'Role',    alignRight: false },
+  { id: 'act',    label: '',        alignRight: false },
 ];
 
 // ----------------------------------------------------------------------
@@ -85,6 +86,8 @@ export default function User() {
   const [orderBy, setOrderBy] = useState('name')
   const [page, setPage] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(5)
+  const [modeModal, setModeModal] = useState('add')
+  const [currentUser, setCurrentUser] = useState({})
   
   const {loading, request} = useHttp()
 
@@ -148,13 +151,26 @@ export default function User() {
   };
 
 
-  const getUser = (event, id) => {
-    console.log(`User ${id} want to `, event.target.value);
+  const getUser = (event, id, firstname, lastname, email, phone, usertype_id) => {
+    console.log(`Edit User ${id}`);
+
+    setCurrentUser({
+      'id':         id, 
+      'firstname':  firstname,
+      'lastname':   lastname, 
+      'email':      email, 
+      'phone':      phone, 
+      'role':       usertype_id
+    })
+    handleOpen('edit')
   }
 
   // Modal -- Add User
   const [open, setOpen] = useState(false)
-  const handleOpen = () => setOpen(true)
+  const handleOpen = (mode) => {
+    setModeModal(mode)
+    setOpen(true)
+  }
   const handleClose = () => setOpen(false)
 
   const handleSubmit = async (event) => {
@@ -185,6 +201,27 @@ export default function User() {
     } else alert('You need to fill fields.')
   }
 
+  const handleSaveChanges = async (event) => {
+    event.preventDefault()
+    const data = new FormData(event.currentTarget)
+    // console.log('name:', data.get('name'))
+    try {
+      const user = await request(`${config.API_URL}api/user/${currentUser.id}`, 'POST', {
+        firstname:    data.get('firstname'),
+        lastname:     data.get('lastname'),
+        email:        data.get('email'),
+        phone:        data.get('phone'),
+        password:     data.get('password'),
+        usertype_id:  role,
+      })
+      if(user){
+        setOpen(false);
+        handleUpdate();
+      }
+    } catch (e) {console.log('error:', e)} 
+  }
+
+
   const handleUpdate = () => {
     getUsers();
   }
@@ -211,7 +248,7 @@ export default function User() {
           <Typography variant="h4" gutterBottom>
             Users
           </Typography>
-          <Button variant="contained" onClick={handleOpen} startIcon={<Iconify icon="eva:plus-fill" />}>
+          <Button variant="contained" onClick={ () => {handleOpen('add')} } startIcon={<Iconify icon="eva:plus-fill" />}>
             New User
           </Button>
           <Modal
@@ -230,9 +267,9 @@ export default function User() {
                   }}
                 >
                   <Typography component="h1" variant="h5">
-                    NEW USER
+                  <span style={{ textTransform: "uppercase" }}>{modeModal}</span> USER
                   </Typography>
-                  <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }} style={{ width:"100%", textAlign:"center" }}>
+                  <Box component="form" noValidate onSubmit={modeModal === 'add' ? handleSubmit: handleSaveChanges} sx={{ mt: 3 }} style={{ width:"100%", textAlign:"center" }}>
                     <Grid container spacing={2}>
                       <Grid container spacing={2} item xs={12} sm={12}>
                         <Grid item xs={12} sm={6} >
@@ -243,6 +280,7 @@ export default function User() {
                             fullWidth
                             id="firstname"
                             label="Name"
+                            defaultValue={currentUser.firstname}
                             autoFocus
                           />
                         </Grid>
@@ -254,6 +292,7 @@ export default function User() {
                             fullWidth
                             id="lastname"
                             label="Surname"
+                            defaultValue={currentUser.lastname}
                             autoFocus
                           />
                         </Grid>
@@ -269,6 +308,7 @@ export default function User() {
                               name="usertype_id"
                               value={role}
                               label="Role"
+                              defaultValue={currentUser.role}
                               onChange={(event) => {setRole(event.target.value)}} 
                             >
                               {config.USERTYPE.map((item, key)=>{
@@ -284,7 +324,7 @@ export default function User() {
                             name="password"
                             fullWidth
                             id="password"
-                            label="Password"
+                            label={modeModal === 'add' ? "Password" : "New password if needed"}
                             autoFocus
                           />
                         </Grid>
@@ -298,6 +338,7 @@ export default function User() {
                             fullWidth
                             id="email"
                             label="Email"
+                            defaultValue={currentUser.email}
                             autoFocus
                           />
                         </Grid>
@@ -308,6 +349,7 @@ export default function User() {
                             fullWidth
                             id="phone"
                             label="Phone"
+                            defaultValue={currentUser.phone}
                             autoFocus
                           />
                         </Grid>
@@ -361,28 +403,28 @@ export default function User() {
                       <TableCell padding="checkbox">
                         <Checkbox checked={isItemSelected} onChange={(event) => handleClick(event, firstname)} />
                       </TableCell>
-                      <TableCell component="th" scope="row" padding="none" onClick={(event) => getUser(event, id)}>
+                      <TableCell component="th" scope="row" padding="normal" onClick={(event) => getUser(event, id, firstname, lastname, email, phone, usertype_id)}>
                         <Stack direction="row" alignItems="center" spacing={2}>
                           <Typography variant="body1" noWrap>
                             {firstname ? sentenceCase(firstname) + ' ' : ''}{lastname ? sentenceCase(lastname) : ''}
                           </Typography>
                         </Stack>
                       </TableCell>
-                      <TableCell component="th" scope="row" padding="none" onClick={(event) => getUser(event, id)}>
+                      <TableCell component="th" scope="row" padding="normal" onClick={(event) => getUser(event, id, firstname, lastname, email, phone, usertype_id)}>
                         <Stack direction="row" alignItems="center" spacing={2}>
                           <Typography variant="body1" noWrap>
                             {email}
                           </Typography>
                         </Stack>
                       </TableCell>
-                      <TableCell component="th" scope="row" padding="none" onClick={(event) => getUser(event, id)}>
+                      <TableCell component="th" scope="row" padding="normal" onClick={(event) => getUser(event, id, firstname, lastname, email, phone, usertype_id)}>
                         <Stack direction="row" alignItems="center" spacing={2}>
                           <Typography variant="body1" noWrap>
                             {phone}
                           </Typography>
                         </Stack>
                       </TableCell>
-                      <TableCell component="th" scope="row" padding="none" onClick={(event) => getUser(event, id)}>
+                      <TableCell component="th" scope="row" padding="normal" onClick={(event) => getUser(event, id, firstname, lastname, email, phone, usertype_id)}>
                         <Stack direction="row" alignItems="center" spacing={2}>
                           <Typography variant="body1" noWrap>
                             {config.USERTYPE[usertype_id]}

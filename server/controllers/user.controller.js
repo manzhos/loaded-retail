@@ -1,10 +1,40 @@
 const DB = require('../db');
 const bcrypt = require('bcryptjs');
 // const genPass = require('generate-password');
-// const jwt = require('jsonwebtoken');
+const jwt = require('jsonwebtoken');
 
-class UserController {  
+class UserController { 
+
+  async loginUser(req, res){
+    console.log('try login')
+    const {email, password} = req.body
+    console.log('data:', email, password)
+    try {
+      let q = await DB.query(`SELECT * FROM users WHERE email = $1`, [email])
+      const user = q.rows[0]
+      if (!user) return res.status(400).json({ message: 'User not found' })
+      
+      const isMatch = await bcrypt.compare(password, user.password)
+      if (!isMatch) return res.status(400).json({ message: 'Incorrect password' })
+      // console.log('user:', user);
+      
+      let exp = '1h'
+      const jwtSecret = process.env.jwtSecret
+      const token = jwt.sign(
+        { userId: user.id },
+        jwtSecret,
+        { expiresIn: exp }
+      )
+      user.password = 'fuckYou';
+      console.log('user:', user);
+      res.json({ token, user:user })
+    } catch (e) {
+      res.status(500).json({ message: 'Something wrong' })
+    }
+  }
+
   async createUser(req, res){
+    // console.log('try create user');
     // save to DB
     const { firstname, lastname, email, phone, usertype_id, password } = req.body;
 
@@ -42,6 +72,33 @@ class UserController {
   }
 
   async updateUser(req, res){
+    // update data
+    const id = req.params.id
+    const { firstname, lastname, email, phone, usertype_id, password } = req.body;
+    // console.log('update user:', firstname, lastname, email, phone, usertype_id, password);
+    const oldUser = await DB.query(` SELECT password FROM users WHERE id = $1`, [id]);
+    // const hashedPassword = await bcrypt.hash(password, 12)
+    let hashedPassword = oldUser.rows[0].password;
+    if (password && password !== '') hashedPassword = await bcrypt.hash(password, 12);
+
+    try{
+      const user = await DB.query(`
+        UPDATE users 
+        SET 
+          firstname   = $2, 
+          lastname    = $3, 
+          email       = $4, 
+          phone       = $5, 
+          usertype_id = $6,
+          password    = $7
+        WHERE id = $1 
+        RETURNING *
+      `, [id, firstname, lastname, email, phone, usertype_id, hashedPassword]);
+      return res.send(user.rows[0]);
+    } catch (err) {
+      console.log(`Error: ${err}`)  
+      return res.status(500).json({message: "The connection with DB was lost."})
+    }
 
   }
 
@@ -53,10 +110,6 @@ class UserController {
     const userDeleted = await DB.query(sql, [id])
     // console.log(`user #${id} with SQL: ${sql}. `, userDeleted)
     res.send(userDeleted) 
-  }
-
-  async loginUser(req, res){
-
   }
 
   async getRoles(req, res){

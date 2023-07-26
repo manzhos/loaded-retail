@@ -19,14 +19,14 @@ const dashboard = {
       icon: icons.IconDashboard,
       breadcrumbs: false
     },
-    {
-      id: 'login',
-      title: 'Login',
-      type: 'item',
-      url: '/login',
-      icon: icons.IconDashboard,
-      breadcrumbs: false
-    },
+    // {
+    //   id: 'login',
+    //   title: 'Login',
+    //   type: 'item',
+    //   url: '/login',
+    //   icon: icons.IconDashboard,
+    //   breadcrumbs: false
+    // },
   ]
 };
 

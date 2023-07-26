@@ -34,6 +34,7 @@ app.use(express.json({ extended: true }))
 app.use('/api', require('./routes/user.routes'))
 app.use('/api', require('./routes/store.routes'))
 app.use('/api', require('./routes/product.routes'))
+app.use('/api', require('./routes/goodtype.routes'))
 // app.use(express.static('files'))
 
 

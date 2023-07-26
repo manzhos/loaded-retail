@@ -40,6 +40,7 @@ import SearchNotFound from '../../../ui-component/SearchNotFound';
 
 const TABLE_HEAD = [
   { id: 'name', label: 'Name', alignRight: false },
+  { id: 'act',  label: '',     alignRight: false },
 ];
 
 // ----------------------------------------------------------------------
@@ -81,6 +82,9 @@ export default function Shop() {
   const [orderBy, setOrderBy] = useState('name')
   const [page, setPage] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(5)
+  const [modeModal, setModeModal] = useState('add')
+  const [currentShopId, setCurrentShopId] = useState()
+  const [currentShopName, setCurrentShopName] = useState('')
   
   const {loading, request} = useHttp()
 
@@ -144,13 +148,19 @@ export default function Shop() {
   };
 
 
-  const getShop = (event, id) => {
-    console.log(`Shop ${id} want to `, event.target.value);
+  const getShop = (event, id, name) => {
+    setCurrentShopId(id)
+    setCurrentShopName(name)
+    // console.log(`Edit Shop ${id}`);
+    handleOpen('edit')
   }
 
   // Modal -- Add Store
   const [open, setOpen] = useState(false)
-  const handleOpen = () => setOpen(true)
+  const handleOpen = (mode) => {
+    setModeModal(mode)
+    setOpen(true)
+  }
   const handleClose = () => setOpen(false)
 
   const handleSubmit = async (event) => {
@@ -160,6 +170,23 @@ export default function Shop() {
     if(data.get('name')){
       try {
         const res = await request(`${config.API_URL}api/store`, 'POST', {
+          name: data.get('name'),
+        })
+        if(res){
+          setOpen(false);
+          handleUpdate();
+        }
+      } catch (e) {console.log('error:', e)} 
+    } else alert('You need to fill fields.')
+  }
+
+  const handleSaveChanges = async (event) => {
+    event.preventDefault()
+    const data = new FormData(event.currentTarget)
+    // console.log('name:', data.get('name'))
+    if(data.get('name')){
+      try {
+        const res = await request(`${config.API_URL}api/store/${currentShopId}`, 'POST', {
           name: data.get('name'),
         })
         if(res){
@@ -197,7 +224,7 @@ export default function Shop() {
             <Typography variant="h4" gutterBottom>
               Stores
             </Typography>
-            <Button variant="contained" onClick={handleOpen} startIcon={<Iconify icon="eva:plus-fill" />}>
+            <Button variant="contained" onClick={() => {handleOpen('add')}} startIcon={<Iconify icon="eva:plus-fill" />}>
               Add Store
             </Button>
             <Modal
@@ -216,9 +243,9 @@ export default function Shop() {
                     }}
                   >
                     <Typography component="h1" variant="h5">
-                      ADD STORE
+                      <span style={{ textTransform: "uppercase" }}>{modeModal}</span> STORE
                     </Typography>
-                    <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }} style={{ width:"100%", textAlign:"center" }}>
+                    <Box component="form" noValidate onSubmit={modeModal === 'add' ? handleSubmit : handleSaveChanges} sx={{ mt: 3 }} style={{ width:"100%", textAlign:"center" }}>
                       <Grid container spacing={2}>
                         <Grid container spacing={2} item xs={12} sm={12}>
                           <Grid item xs={12} sm={12} >
@@ -229,6 +256,7 @@ export default function Shop() {
                               fullWidth
                               id="name"
                               label="Name"
+                              defaultValue={currentShopName}
                               autoFocus
                             />
                           </Grid>
@@ -282,7 +310,7 @@ export default function Shop() {
                         <TableCell padding="checkbox">
                           <Checkbox checked={isItemSelected} onChange={(event) => handleClick(event, name)} />
                         </TableCell>
-                        <TableCell component="th" scope="row" padding="none" onClick={(event) => getShop(event, id)}>
+                        <TableCell component="th" scope="row" padding="normal" onClick={(event) => getShop(event, id, name)}>
                           <Stack direction="row" alignItems="center" spacing={2}>
                             <Typography variant="body1" noWrap>
                               {sentenceCase(name)}

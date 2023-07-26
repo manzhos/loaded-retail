@@ -34,7 +34,9 @@ create TABLE products(
 
 create TABLE product_types(
   "id" SERIAL4 PRIMARY KEY,
-  "proceduretype" TEXT NOT NULL
+  "product_type" TEXT NOT NULL,
+  "archive" BOOLEAN DEFAULT false,
+  "ts" TIMESTAMP
 );
 
 create TABLE files(

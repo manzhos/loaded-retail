@@ -37,7 +37,17 @@ class StoreController {
   }
 
   async updateStore(req, res){
-
+    // update data
+    const id = req.params.id
+    const { name } = req.body;
+    // console.log('update store name:', name);
+    try{
+      const store = await DB.query(`UPDATE stores SET name=$2 WHERE id = $1 RETURNING *`, [id, name]);
+      return res.send(store.rows[0]);
+    } catch (err) {
+      console.log(`Error: ${err}`)  
+      return res.status(500).json({message: "The connection with DB was lost."})
+    }
   }
 
   async deleteStore(req, res){

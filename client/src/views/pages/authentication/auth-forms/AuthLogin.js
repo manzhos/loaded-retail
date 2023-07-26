@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import { useNavigate } from 'react-router';
 
 // material-ui
@@ -29,13 +29,14 @@ import AnimateButton from 'ui-component/extended/AnimateButton';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
-// ============================|| FIREBASE - LOGIN ||============================ //
+import { AuthContext } from '../../../../context/AuthContext'
+import { useHttp } from '../../../../hooks/http.hook'
+import config from '../../../../config';
 
 const Login = (others) => {
   const theme = useTheme();
   const navigate  = useNavigate();
   const scriptedRef = useScriptRef();
-  // const [checked, setChecked] = useState(true);
 
   const [showPassword, setShowPassword] = useState(false);
   const handleClickShowPassword = () => {
@@ -45,6 +46,23 @@ const Login = (others) => {
   const handleMouseDownPassword = (event) => {
     event.preventDefault();
   };
+
+  const auth = useContext(AuthContext)
+  const {request} = useHttp()
+
+  const handleAuth = async (values) => {
+    console.log('values:', values);
+    try {
+      const res = await request(`${config.API_URL}api/login`, 'POST', {
+        email:      values.username,
+        password:   values.password,
+      })
+      console.log('res', res);
+      auth.login(res.token, res.user.id)
+    } catch (err) {
+      console.error(err);
+    }
+  }
 
   return (
     <>
@@ -58,21 +76,7 @@ const Login = (others) => {
           // email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
           password: Yup.string().max(255).required('Password is required')
         })}
-        onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
-          try {
-            if (scriptedRef.current) {
-              setStatus({ success: true });
-              setSubmitting(false);
-            }
-          } catch (err) {
-            console.error(err);
-            if (scriptedRef.current) {
-              setStatus({ success: false });
-              setErrors({ submit: err.message });
-              setSubmitting(false);
-            }
-          }
-        }}
+        onSubmit={async (values) => {handleAuth(values)}}
       >
         {({ 
           errors, 
@@ -134,17 +138,6 @@ const Login = (others) => {
                 </FormHelperText>
               )}
             </FormControl>
-            {/* <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={1}>
-              <FormControlLabel
-                control={
-                  <Checkbox checked={checked} onChange={(event) => setChecked(event.target.checked)} name="checked" color="primary" />
-                }
-                label="Remember me"
-              />
-              <Typography variant="subtitle1" color="secondary" sx={{ textDecoration: 'none', cursor: 'pointer' }}>
-                Forgot Password?
-              </Typography>
-            </Stack> */}
             {errors.submit && (
               <Box sx={{ mt: 3 }}>
                 <FormHelperText error>{errors.submit}</FormHelperText>
@@ -153,7 +146,7 @@ const Login = (others) => {
 
             <Box sx={{ mt: 2 }}>
               <AnimateButton>
-                <Button fullWidth size="large" type="button" variant="contained" color="secondary" onClick={()=>{navigate('/')}}>
+                <Button fullWidth size="large" type="submit" variant="contained" color="secondary" >
                   Sign in
                 </Button>
                 {/* <Button disableElevation disabled={isSubmitting} fullWidth size="large" type="submit" variant="contained" color="secondary">

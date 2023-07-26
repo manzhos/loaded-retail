@@ -1,11 +1,12 @@
 // assets
-import { IconBuildingStore, IconUserCircle, IconBoxSeam } from '@tabler/icons';
+import { IconBuildingStore, IconUserCircle, IconBoxSeam, IconTableOptions } from '@tabler/icons';
 
 // constant
 const icons = {
   IconBoxSeam,
   IconBuildingStore,
-  IconUserCircle
+  IconUserCircle,
+  IconTableOptions
 };
 
 // ==============================|| EXTRA PAGES MENU ITEMS ||============================== //
@@ -21,6 +22,14 @@ const management = {
       type: 'item',
       url: '/goods',
       icon: icons.IconBoxSeam,
+      breadcrumbs: false
+    },
+    {
+      id: 'good_types',
+      title: 'Type of goods',
+      type: 'item',
+      url: '/goodtypes',
+      icon: icons.IconTableOptions,
       breadcrumbs: false
     },
     {
