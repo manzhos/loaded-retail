@@ -51,13 +51,13 @@ const Login = (others) => {
   const {request} = useHttp()
 
   const handleAuth = async (values) => {
-    console.log('values:', values);
+    // console.log('values:', values);
     try {
       const res = await request(`${config.API_URL}api/login`, 'POST', {
         email:      values.username,
         password:   values.password,
       })
-      console.log('res', res);
+      // console.log('res', res);
       auth.login(res.token, res.user.id)
     } catch (err) {
       console.error(err);
