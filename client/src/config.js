@@ -8,12 +8,12 @@ const config = {
   borderRadius: 12,
 
   // dev
-  API_URL: 'http://localhost:3300/',
-  URL: 'http://localhost:3100/',
+  // API_URL: 'http://localhost:3300/',
+  // URL: 'http://localhost:3100/',
   
   //production
-  // API_URL: 'http://195.110.59.101/',
-  // URL:     'http://195.110.59.101/',
+  API_URL: 'http://195.110.59.101/',
+  URL:     'http://195.110.59.101/',
   
   MONTH: [
     'Jan',
