@@ -9,10 +9,10 @@ import {
   ListItemText,
  } from '@mui/material';
 // component
-// import { AuthContext } from '../../../context/AuthContext'
-import Iconify from '../../../ui-component/Iconify';
-import { useHttp } from '../../../hooks/http.hook'
-import config from '../../../config';
+// import { AuthContext } from 'context/AuthContext'
+import Iconify from 'ui-component/Iconify';
+import { useHttp } from 'hooks/http.hook'
+import config from 'config';
 
 // ----------------------------------------------------------------------
 

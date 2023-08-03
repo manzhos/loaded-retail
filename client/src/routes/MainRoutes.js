@@ -8,10 +8,11 @@ import Loadable from 'ui-component/Loadable';
 const DashboardDefault = Loadable(lazy(() => import('views/dashboard/Default')));
 
 // store / shop routing
-const Product = Loadable(lazy(() => import('views/pages/product/Product')));
-const GoodType = Loadable(lazy(() => import('views/pages/goodType/GoodType')));
-const Shop = Loadable(lazy(() => import('views/pages/shop/Shop')));
-const User = Loadable(lazy(() => import('views/pages/user/User')));
+const Product     = Loadable(lazy(() => import('views/pages/product/Product')));
+const ProductFlow = Loadable(lazy(() => import('views/pages/product/ProductFlow')));
+const GoodType    = Loadable(lazy(() => import('views/pages/goodType/GoodType')));
+const Shop        = Loadable(lazy(() => import('views/pages/shop/Shop')));
+const User        = Loadable(lazy(() => import('views/pages/user/User')));
 
 // ==============================|| MAIN ROUTING ||============================== //
 
@@ -21,7 +22,7 @@ const MainRoutes = {
   children: [
     {
       path: '/',
-      element: <DashboardDefault />
+      element: <ProductFlow />
     },
     {
       path: 'dashboard',
@@ -29,6 +30,10 @@ const MainRoutes = {
         {
           path: 'default',
           element: <DashboardDefault />
+        },
+        {
+          path: 'flow',
+          element: <ProductFlow />
         }
       ]
     },

@@ -7,6 +7,7 @@ create TABLE users(
   "password" TEXT NOT NULL,
   "ts" TIMESTAMP, 
   "usertype_id" INT2,
+  "store_id" INT2,
   "avatar" TEXT,
   "archive" BOOLEAN DEFAULT false
 );
@@ -45,8 +46,17 @@ create TABLE files(
   "type" TEXT, 
   "size" INT4, 
   "path" TEXT, 
-  "user_id" INT4, 
-  "doc_id" INT4, 
   "ts" TIMESTAMP
+);
+
+create TABLE product_store_flow(
+  "id" SERIAL4 PRIMARY KEY,
+  "product_id" INT4,
+  "store_id" INT4,
+  "qty" INT4,
+  "ts" TIMESTAMP,
+  "direction" TEXT, -- 'in'/'out'
+  "user_id" INT4,
+  "photo_id" INT4
 );
 

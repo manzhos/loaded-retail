@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 
-// import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
 // material-ui
@@ -30,13 +30,16 @@ import { IconSettings, IconLogout } from '@tabler/icons';
 const ProfileSection = () => {
   const theme = useTheme();
   const customization = useSelector((state) => state.customization);
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
 
   const [open, setOpen] = useState(false);
   const anchorRef = useRef(null);
 
   const handleLogout = async () => {
-    console.log('Logout');
+    // console.log('Logout');
+    localStorage.clear();
+    navigate('/');
+    window.location.reload();
   };
 
   const handleClose = (event) => {

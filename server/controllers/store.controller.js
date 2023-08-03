@@ -52,7 +52,7 @@ class StoreController {
 
   async deleteStore(req, res){
     const id = req.params.id
-    console.log('delete store by ID:', id)
+    // console.log('delete store by ID:', id)
     const sql = `DELETE FROM stores WHERE id = $1 RETURNING name;`
     // const sql =`UPDATE stores SET archive = true WHERE id = $1;`    
     const storeDeleted = await DB.query(sql, [id])

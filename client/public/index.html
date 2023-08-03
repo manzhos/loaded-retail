@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>LOADED RETAIL -- the store</title>
+    <title>LOADED RETAIL</title>
     <link rel="icon" href="%PUBLIC_URL%/favicon.svg" />
     <!-- Meta Tags-->
     <meta charset="utf-8" />
@@ -10,10 +10,19 @@
     <meta name="title" content="LOADED RETAIL" />
     <meta name="author" content="CodedThemes" />
     <!-- Open Graph / Facebook -->
-    <meta property="og:locale" content="en_US" />
+    <!-- <meta property="og:locale" content="en_US" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://loadedretail.io/" />
-    <meta property="og:site_name" content="loadedretail.io" />
+    <meta property="og:site_name" content="loadedretail.io" /> -->
+
+    <!-- PWA -->
+    <link rel="manifest" href="icons/site.webmanifest">
+
+    <link rel="manifest" href="manifest.json">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="theme-color" content="#DEC19F">  
+    <!-- /PWA -->
+  
 
     <link rel="preconnect" href="https://fonts.gstatic.com" />
     <link
@@ -25,15 +34,13 @@
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
-    <!--
-          This HTML file is a template.
-          If you open it directly in the browser, you will see an empty page.
+    
+    <!-- pwa script -->
+    <script type="module">
+      import 'https://cdn.jsdelivr.net/npm/@pwabuilder/pwaupdate';
+      const el = document.createElement('pwa-update');
+      document.body.appendChild(el);  
+    </script>
 
-          You can add webfonts, meta tags, or analytics to this file.
-          The build step will place the bundled scripts into the <body> tag.
-
-          To begin the development, run `npm start` or `yarn start`.
-          To create a production bundle, use `npm run build` or `yarn build`.
-   -->
   </body>
 </html>

@@ -2,12 +2,12 @@ import { sentenceCase } from 'change-case';
 import { filter } from 'lodash';
 import { useState, useCallback, useEffect } from 'react';
 // import { Link as RouterLink } from 'react-router-dom';
-import { useHttp } from '../../../hooks/http.hook';
-// import { AuthContext } from '../../context/AuthContext';
-import config from '../../../config';
+import { useHttp } from 'hooks/http.hook';
+// import { AuthContext } from 'context/AuthContext';
+import config from 'config';
 
-import Loader from '../../../ui-component/Loader';
-// import Page   from '../../../ui-component/Page';
+import Loader from 'ui-component/Loader';
+// import Page   from 'ui-component/Page';
 // material
 import {
   Card,
@@ -33,16 +33,17 @@ import {
   TablePagination,
 } from '@mui/material';
 import { UserListHead, UserListToolbar, UserMoreMenu } from '.';
-import Iconify        from '../../../ui-component/Iconify';
-import SearchNotFound from '../../../ui-component/SearchNotFound';
+import Iconify        from 'ui-component/Iconify';
+import SearchNotFound from 'ui-component/SearchNotFound';
 
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
   { id: 'name',   label: 'Name',    alignRight: false },
+  { id: 'role',   label: 'Role',    alignRight: false },
+  { id: 'store',  label: 'Store',   alignRight: false },
   { id: 'email',  label: 'Email',   alignRight: false },
   { id: 'phone',  label: 'Phone',   alignRight: false },
-  { id: 'role',   label: 'Role',    alignRight: false },
   { id: 'act',    label: '',        alignRight: false },
 ];
 
@@ -79,7 +80,6 @@ function applySortFilter(array, comparator, query) {
 export default function User() {
   // const {token} = useContext(AuthContext)
   const [userList, setUserList] = useState([])
-  const [role, setRole] = useState(3)
   const [selected, setSelected] = useState([])
   const [filterName, setFilterName] = useState('')
   const [order, setOrder] = useState('asc')
@@ -88,6 +88,8 @@ export default function User() {
   const [rowsPerPage, setRowsPerPage] = useState(5)
   const [modeModal, setModeModal] = useState('add')
   const [currentUser, setCurrentUser] = useState({})
+  const [storeList, setStoreList] = useState([])
+  const [currentStore, setCurrentStore] = useState({})
   
   const {loading, request} = useHttp()
 
@@ -101,6 +103,17 @@ export default function User() {
     } catch (e) { console.log('error:', e)}
   }, [request, userList])
   useEffect(() => {getUsers()}, [])
+  
+  const getStores = useCallback(async () => {
+    try {
+      const stores = await request(`${config.API_URL}api/store`, 'GET', null, {
+        // Authorization: `Bearer ${token}`
+      })
+      // console.log('stores:', stores);
+      setStoreList(stores);
+    } catch (e) { console.log('error:', e)}
+  }, [request, storeList])
+  useEffect(() => {getStores()}, [])
   
   const handleClick = (event, name) => {
     const selectedIndex = selected.indexOf(name);
@@ -151,7 +164,7 @@ export default function User() {
   };
 
 
-  const getUser = (event, id, firstname, lastname, email, phone, usertype_id) => {
+  const getUser = (event, id, firstname, lastname, email, phone, usertype_id, store_id) => {
     console.log(`Edit User ${id}`);
 
     setCurrentUser({
@@ -160,7 +173,8 @@ export default function User() {
       'lastname':   lastname, 
       'email':      email, 
       'phone':      phone, 
-      'role':       usertype_id
+      'usertype_id':usertype_id,
+      'store_id':   store_id,
     })
     handleOpen('edit')
   }
@@ -168,6 +182,7 @@ export default function User() {
   // Modal -- Add User
   const [open, setOpen] = useState(false)
   const handleOpen = (mode) => {
+    if(mode === 'add') setCurrentUser({})
     setModeModal(mode)
     setOpen(true)
   }
@@ -181,7 +196,7 @@ export default function User() {
     //   data.get('lastname'), '\n',
     //   data.get('email'), '\n',
     //   data.get('phone'), '\n',
-    //   role, '\n',
+    //   usertype_id, '\n',
     // )
     if(data.get('firstname')){
       try {
@@ -191,7 +206,8 @@ export default function User() {
           email:        data.get('email'),
           phone:        data.get('phone'),
           password:     data.get('password'),
-          usertype_id:  role,
+          store_id:     data.get('store_id'),
+          usertype_id:  data.get('usertype_id'),
         })
         if(res){
           setOpen(false);
@@ -204,7 +220,7 @@ export default function User() {
   const handleSaveChanges = async (event) => {
     event.preventDefault()
     const data = new FormData(event.currentTarget)
-    // console.log('name:', data.get('name'))
+    // console.log('store_id:', data.get('store_id'))
     try {
       const user = await request(`${config.API_URL}api/user/${currentUser.id}`, 'POST', {
         firstname:    data.get('firstname'),
@@ -212,8 +228,10 @@ export default function User() {
         email:        data.get('email'),
         phone:        data.get('phone'),
         password:     data.get('password'),
-        usertype_id:  role,
+        store_id:     data.get('store_id'),
+        usertype_id:  data.get('usertype_id'),
       })
+      // console.log('user', user);
       if(user){
         setOpen(false);
         handleUpdate();
@@ -237,7 +255,6 @@ export default function User() {
       } catch (e) { console.log('error:', e)}
     })
   }
-
 
 
   if (loading) return <Loader/>
@@ -306,14 +323,15 @@ export default function User() {
                               labelId="role-select"
                               id="role-select"
                               name="usertype_id"
-                              value={role}
                               label="Role"
-                              defaultValue={currentUser.role}
-                              onChange={(event) => {setRole(event.target.value)}} 
+                              value={currentUser.usertype_id}
+                              onChange={(event) => {
+                                setCurrentUser({...currentUser, 'usertype_id':event.target.value})
+                              }}
                             >
                               {config.USERTYPE.map((item, key)=>{
                                 return(
-                                  <MenuItem key={key} value={key}>{sentenceCase(item)}</MenuItem>
+                                  <MenuItem key={key} value={key} >{sentenceCase(item)}</MenuItem>
                                 )
                               })}
                             </Select>
@@ -353,6 +371,32 @@ export default function User() {
                             autoFocus
                           />
                         </Grid>
+                        { currentUser.usertype_id > 0 &&
+                          <Grid container item xs={12} sm={12}>
+                            <Grid item xs={12} sm={3}>&nbsp;</Grid>
+                            <Grid item xs={12} sm={6}>
+                              <FormControl sx={{ width: 1 }}>
+                                <InputLabel id="store-select">Store</InputLabel>
+                                <Select
+                                  labelId="store-select"
+                                  id="store-select"
+                                  name="store_id"
+                                  value={currentStore?.id}
+                                  label="Store"
+                                  defaultValue={currentUser.store_id}
+                                  onChange={(event) => {setCurrentStore(storeList.find(s => s.id === event.target.value))}} 
+                                >
+                                  {storeList.map((item, key)=>{
+                                    return(
+                                      <MenuItem key={key} value={item.id}>{item.name}</MenuItem>
+                                    )
+                                  })}
+                                </Select>
+                              </FormControl>
+                            </Grid>
+                            <Grid item xs={12} sm={3}>&nbsp;</Grid>
+                          </Grid>
+                        }
                       </Grid>
                     </Grid>
                     <Button
@@ -387,7 +431,7 @@ export default function User() {
               <TableBody>
                 {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
                 // {filteredUsers.map((row) => {
-                  const { id, firstname, lastname, email, phone, usertype_id } = row;
+                  const { id, firstname, lastname, email, phone, usertype_id, store_id } = row;
                   const isItemSelected = selected.indexOf(firstname) !== -1;
 
                   return (
@@ -403,31 +447,38 @@ export default function User() {
                       <TableCell padding="checkbox">
                         <Checkbox checked={isItemSelected} onChange={(event) => handleClick(event, firstname)} />
                       </TableCell>
-                      <TableCell component="th" scope="row" padding="normal" onClick={(event) => getUser(event, id, firstname, lastname, email, phone, usertype_id)}>
+                      <TableCell component="th" scope="row" padding="normal" onClick={(event) => getUser(event, id, firstname, lastname, email, phone, usertype_id, store_id)}>
                         <Stack direction="row" alignItems="center" spacing={2}>
                           <Typography variant="body1" noWrap>
                             {firstname ? sentenceCase(firstname) + ' ' : ''}{lastname ? sentenceCase(lastname) : ''}
                           </Typography>
                         </Stack>
                       </TableCell>
-                      <TableCell component="th" scope="row" padding="normal" onClick={(event) => getUser(event, id, firstname, lastname, email, phone, usertype_id)}>
+                      <TableCell component="th" scope="row" padding="normal" onClick={(event) => getUser(event, id, firstname, lastname, email, phone, usertype_id, store_id)}>
+                        <Stack direction="row" alignItems="center" spacing={2}>
+                          <Typography variant="body1" noWrap>
+                            {config.USERTYPE[usertype_id]}
+                          </Typography>
+                        </Stack>
+                      </TableCell>
+                      <TableCell component="th" scope="row" padding="normal" onClick={(event) => getUser(event, id, firstname, lastname, email, phone, usertype_id, store_id)}>
+                        <Stack direction="row" alignItems="center" spacing={2}>
+                          <Typography variant="body1" noWrap>
+                            {store_id !== null ? storeList.find(s => s.id === store_id)?.name : ''}
+                          </Typography>
+                        </Stack>
+                      </TableCell>
+                      <TableCell component="th" scope="row" padding="normal" onClick={(event) => getUser(event, id, firstname, lastname, email, phone, usertype_id, store_id)}>
                         <Stack direction="row" alignItems="center" spacing={2}>
                           <Typography variant="body1" noWrap>
                             {email}
                           </Typography>
                         </Stack>
                       </TableCell>
-                      <TableCell component="th" scope="row" padding="normal" onClick={(event) => getUser(event, id, firstname, lastname, email, phone, usertype_id)}>
+                      <TableCell component="th" scope="row" padding="normal" onClick={(event) => getUser(event, id, firstname, lastname, email, phone, usertype_id, store_id)}>
                         <Stack direction="row" alignItems="center" spacing={2}>
                           <Typography variant="body1" noWrap>
                             {phone}
-                          </Typography>
-                        </Stack>
-                      </TableCell>
-                      <TableCell component="th" scope="row" padding="normal" onClick={(event) => getUser(event, id, firstname, lastname, email, phone, usertype_id)}>
-                        <Stack direction="row" alignItems="center" spacing={2}>
-                          <Typography variant="body1" noWrap>
-                            {config.USERTYPE[usertype_id]}
                           </Typography>
                         </Stack>
                       </TableCell>

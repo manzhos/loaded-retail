@@ -20,7 +20,7 @@ import NavigationScroll from 'layout/NavigationScroll';
 const App = () => {
   const customization = useSelector((state) => state.customization);
 
-  const {token, login, logout, userId, ready} = useAuth();
+  const {token, login, logout, userId, userTypeId, storeId, ready} = useAuth();
   const isAuthenticated = !!token;
 
   // const routes = useMyRoutes(isAuthenticated);
@@ -29,7 +29,7 @@ const App = () => {
     <StyledEngineProvider injectFirst>
       <ThemeProvider theme={themes(customization)}>
         <AuthContext.Provider value={{
-          token, login, logout, userId, isAuthenticated
+          token, login, logout, userId, userTypeId, storeId, isAuthenticated
         }}>
           <CssBaseline />
           <NavigationScroll>

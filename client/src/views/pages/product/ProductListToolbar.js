@@ -1,10 +1,11 @@
-import React, {useState} from 'react';
+import React, { useState, useContext } from 'react';
 import PropTypes from 'prop-types';
 // material
 import { styled } from '@mui/material/styles';
-import { Toolbar, Tooltip, IconButton, Typography, OutlinedInput, InputAdornment } from '@mui/material';
+import { Toolbar, Tooltip, IconButton, Typography, OutlinedInput, InputAdornment, Select, MenuItem, InputLabel, FormControl } from '@mui/material';
 // component
-import Iconify from '../../../ui-component/Iconify';
+import Iconify from 'ui-component/Iconify';
+import { AuthContext } from 'context/AuthContext';
 
 // ----------------------------------------------------------------------
 
@@ -34,13 +35,22 @@ ProductListToolbar.propTypes = {
   numSelected: PropTypes.number,
 };
 
-export default function ProductListToolbar({ numSelected, onFilterName, onDelete }) {
+export default function ProductListToolbar({ numSelected, onFilterName, storeList, onStore, currentStore = '', onDelete }) {
+  const { storeId } = useContext(AuthContext);
   const [productFilter, setProductFilter] = useState('');
+  // console.log('Store List:', storeList);
+  // console.log('Current Store:', currentStore);
+  // console.log('storeId:', storeId);
 
   const handleChange = (event) => {
     // console.log('handleChange', event.target.value);
     setProductFilter(event.target.value);
     onFilterName(event.target.value);
+  }
+
+  const handleStoreChange = (event) => {
+    // console.log('handleStoreChange', event.target.value);
+    onStore(event.target.value);
   }
 
   return (
@@ -69,10 +79,34 @@ export default function ProductListToolbar({ numSelected, onFilterName, onDelete
             }
           />
           <div style={{ width:"20px" }}>&nbsp;</div>
-          {/* <ProductRole uRole={productRole} onChangeProductRole={handleChangeProductRole} /> */}
-          {/* <Button variant='outlined' onClick={handleReset} style={{margin:'0 auto 0 20px'}}>Reset</Button> */}
         </>
       )}
+      {storeId ? (
+          <Typography component="div" variant="h2" style={{ textDecoration:"underline" }}>
+            Store {storeList.find(s => s.id === storeId)?.name}
+          </Typography>
+        ) : (
+          <FormControl style={{ width: "60%" }}>
+            <InputLabel id="store-select">Store</InputLabel>
+            <Select
+              labelId="store-select"
+              id="store-select"
+              name="store_id"
+              value={currentStore}
+              label="Store"
+              onChange={handleStoreChange} 
+            >
+              <MenuItem key='all stores' value={'all_stores'}>All stores</MenuItem>
+              {storeList.map((item, key)=>{
+                return(
+                  <MenuItem key={key} value={item.id}>{item.name}</MenuItem>
+                )
+              })}
+            </Select>
+          </FormControl>
+        )
+      }
+      <div style={{ width:"20px" }}>&nbsp;</div>
 
       {numSelected > 0 ? (
         <Tooltip title="Delete">

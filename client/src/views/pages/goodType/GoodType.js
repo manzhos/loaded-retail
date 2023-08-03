@@ -2,12 +2,12 @@ import { sentenceCase } from 'change-case';
 import { filter } from 'lodash';
 import { useState, useCallback, useEffect } from 'react';
 // import { Link as RouterLink } from 'react-router-dom';
-import { useHttp } from '../../../hooks/http.hook';
-// import { AuthContext } from '../../context/AuthContext';
-import config from '../../../config';
+import { useHttp } from 'hooks/http.hook';
+// import { AuthContext } from 'context/AuthContext';
+import config from 'config';
 
-import Loader from '../../../ui-component/Loader';
-// import Page   from '../../../ui-component/Page';
+import Loader from 'ui-component/Loader';
+// import Page   from 'ui-component/Page';
 // material
 import {
   Card,
@@ -33,8 +33,8 @@ import {
   TablePagination,
 } from '@mui/material';
 import { GoodTypeListHead, GoodTypeListToolbar, GoodTypeMoreMenu } from '.';
-import Iconify        from '../../../ui-component/Iconify';
-import SearchNotFound from '../../../ui-component/SearchNotFound';
+import Iconify        from 'ui-component/Iconify';
+import SearchNotFound from 'ui-component/SearchNotFound';
 
 // ----------------------------------------------------------------------
 

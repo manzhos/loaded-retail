@@ -142,3 +142,28 @@
 input {
   text-align: center;
 }
+
+.up-btn {
+  cursor: pointer;
+  width: 96px;
+  height: 96px;
+  color: lightgray;
+  border: 2px solid lightgray;
+  border-radius: 20px;
+  padding: 20px 18px 20px 22px;
+  margin: 10px;
+}
+
+.up-photo {
+  width: 96px;
+  height: 96px;
+  border: 2px solid lightgray;
+  border-radius: 20px;
+  color: lightgray;
+  background: white;
+  padding: 5px;
+  margin: 10px;
+  overflow: hidden;
+}
+
+

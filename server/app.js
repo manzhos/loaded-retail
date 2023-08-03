@@ -2,7 +2,7 @@ const express    = require('express')
 const session    = require('express-session');
 const cors       = require('cors')
 const bodyParser = require('body-parser')
-// const fileUpload = require('express-fileupload')
+const fileUpload = require('express-fileupload')
 const app        = express()
 require('dotenv').config()
 
@@ -20,7 +20,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.raw());
 app.use(bodyParser.urlencoded({ extended: true }))
 
-// app.use(fileUpload({}))
+app.use(fileUpload({}))
 
 app.set('view engine', 'ejs');
 
@@ -35,7 +35,9 @@ app.use('/api', require('./routes/user.routes'))
 app.use('/api', require('./routes/store.routes'))
 app.use('/api', require('./routes/product.routes'))
 app.use('/api', require('./routes/goodtype.routes'))
-// app.use(express.static('files'))
+
+app.use('/api', require('./routes/file.routes'))
+app.use(express.static('files'))
 
 
 // start server

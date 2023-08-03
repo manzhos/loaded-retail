@@ -22,7 +22,8 @@ const management = {
       type: 'item',
       url: '/goods',
       icon: icons.IconBoxSeam,
-      breadcrumbs: false
+      breadcrumbs: false,
+      permission: 2
     },
     {
       id: 'good_types',
@@ -30,7 +31,8 @@ const management = {
       type: 'item',
       url: '/goodtypes',
       icon: icons.IconTableOptions,
-      breadcrumbs: false
+      breadcrumbs: false,
+      permission: 1
     },
     {
       id: 'stores',
@@ -38,7 +40,8 @@ const management = {
       type: 'item',
       url: '/stores',
       icon: icons.IconBuildingStore,
-      breadcrumbs: false
+      breadcrumbs: false,
+      permission: 0
     },
     {
       id: 'users',
@@ -46,7 +49,8 @@ const management = {
       type: 'item',
       url: '/users',
       icon: icons.IconUserCircle,
-      breadcrumbs: false
+      breadcrumbs: false,
+      permission: 0
     }
   ]
 };

@@ -1,13 +1,15 @@
+import { useContext } from 'react';
 import { sentenceCase } from 'change-case';
 import { filter } from 'lodash';
 import { useState, useCallback, useEffect } from 'react';
 // import { Link as RouterLink } from 'react-router-dom';
-import { useHttp } from '../../../hooks/http.hook';
-// import { AuthContext } from '../../context/AuthContext';
-import config from '../../../config';
+import { useHttp } from 'hooks/http.hook';
+import { AuthContext } from 'context/AuthContext';
+import config from 'config';
 
-import Loader from '../../../ui-component/Loader';
-// import Page   from '../../../ui-component/Page';
+import Loader from 'ui-component/Loader';
+import AddFile from 'views/components/AddFile';
+// import Page   from 'ui-component/Page';
 // material
 import {
   Card,
@@ -34,8 +36,8 @@ import {
   TablePagination,
 } from '@mui/material';
 import { ProductListHead, ProductListToolbar, ProductMoreMenu } from '.';
-import Iconify        from '../../../ui-component/Iconify';
-import SearchNotFound from '../../../ui-component/SearchNotFound';
+import Iconify        from 'ui-component/Iconify';
+import SearchNotFound from 'ui-component/SearchNotFound';
 
 // ----------------------------------------------------------------------
 
@@ -78,29 +80,35 @@ function applySortFilter(array, comparator, query) {
 
 
 export default function Product() {
-  // const {token} = useContext(AuthContext)
-  const [productList, setProductList] = useState([])
-  const [productTypeId, setProductTypeId] = useState(1)
-  const [productTypeList, setProductTypeList] = useState([])
-  const [selected, setSelected] = useState([])
-  const [filterName, setFilterName] = useState('')
-  const [order, setOrder] = useState('asc')
-  const [orderBy, setOrderBy] = useState('name')
-  const [page, setPage] = useState(0)
-  const [rowsPerPage, setRowsPerPage] = useState(5)
-  const [currentProduct, setCurrentProduct] = useState({})
+  const { userId, token, userTypeId, storeId } = useContext(AuthContext);
+  // console.log('userTypeId:', userTypeId, 'userId:', userId, 'storeId:', storeId);
+  const [productList, setProductList] = useState([]);
+  const [productTypeId, setProductTypeId] = useState(1);
+  const [productTypeList, setProductTypeList] = useState([]);
+  const [selected, setSelected] = useState([]);
+  const [filterName, setFilterName] = useState('');
+  const [order, setOrder] = useState('asc');
+  const [orderBy, setOrderBy] = useState('name');
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [currentProduct, setCurrentProduct] = useState({});
+  const [storeList, setStoreList] = useState([]);
+  const [currentStore, setCurrentStore] = useState(storeId ? storeId : null);
+  const [files, setFiles] = useState();
   
   const {loading, request} = useHttp()
 
-  const getProducts = useCallback(async () => {
+  const getProducts = useCallback(async (sId = storeId) => {
+    // console.log('get products for store:', storeId);
+
     try {
-      const products = await request(`${config.API_URL}api/product`, 'GET', null, {
-        // Authorization: `Bearer ${token}`
+      const products = await request(`${config.API_URL}api/product${sId ? `?store_id=${sId}` : ''}`, 'GET', null, {
+        Authorization: `Bearer ${token}`
       })
-      console.log('products:', products);
+      // console.log('products:', products);
       setProductList(products);
     } catch (e) { console.log('error:', e)}
-  }, [request, productList])
+  }, [token, request, productList])
   useEffect(() => {getProducts()}, [])
 
   const getProductTypes = useCallback(async () => {
@@ -113,7 +121,18 @@ export default function Product() {
     } catch (e) { console.log('error:', e)}
   }, [request, productTypeList])
   useEffect(() => {getProductTypes()}, []) 
-  
+
+  const getStores = useCallback(async () => {
+    try {
+      const stores = await request(`${config.API_URL}api/store`, 'GET', null, {
+        Authorization: `Bearer ${token}`
+      })
+      // console.log('stores:', stores);
+      setStoreList(stores);
+    } catch (e) { console.log('error:', e)}
+  }, [token, request, storeList])
+  useEffect(() => {getStores()}, [])
+
   const handleClick = (event, name) => {
     const selectedIndex = selected.indexOf(name);
     let newSelected = [];
@@ -146,6 +165,18 @@ export default function Product() {
   const handleFilterByName = (filterString) => {
     setFilterName(filterString);
   };
+
+  const handleStore = (storeId) => {
+    // console.log('NEW filter by store:', storeId);
+    if(storeId === 'all_stores') {
+      setCurrentStore();
+      getProducts();
+    }
+    else{
+      setCurrentStore(storeId);
+      getProducts(storeId);
+    }
+  }
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc'
@@ -197,6 +228,9 @@ export default function Product() {
           product:        data.get('product'),
           producttype_id: data.get('producttype_id'),
           cost:           data.get('cost'),
+          store_id:       data.get('store_id'),
+          qty:            data.get('qty'),
+          user_id:        userId,
         })
         if(res){
           setOpen(false);
@@ -231,9 +265,32 @@ export default function Product() {
     event.preventDefault()
     const data = new FormData(event.currentTarget)
     // console.log('data:', data.get('qty'))
+    if(Number(data.get('qty')) + Number(currentProduct.quantity) < 0) {
+      alert('Need to check the selling quantity.');
+      return;
+    }
+
+    let uploadedFiles = {};
+    if(files){
+      // console.log('files:', files)
+      try{
+        const formData = new FormData();
+        files.map((item)=>{ formData.append('file', item) });
+        const res = await fetch(`${config.API_URL}api/file`, {
+          method: 'POST', 
+          body: formData,
+        });
+        uploadedFiles = await res.json();
+        console.log('Uploaded Files:', uploadedFiles);
+      } catch (err) { console.error('Error:', err) }
+    } 
+
     try {
       const res = await request(`${config.API_URL}api/qtyproduct/${currentProduct.id}`, 'PATCH', {
+        store_id: currentStore,
+        user_id:  userId,
         quantity: data.get('qty'),
+        photo_id: uploadedFiles[0]?.id || null
       })
       if(res){
         setOpenQty(false);
@@ -241,6 +298,12 @@ export default function Product() {
       }
     } catch (e) {console.log('error:', e)} 
   }
+
+  const handlerFileChange = (files) => {
+    // console.log('files:', files);
+    setFiles(files);
+  }
+
 
   if (loading) return <Loader/>
   else {
@@ -250,9 +313,11 @@ export default function Product() {
           <Typography variant="h4" gutterBottom>
             Products
           </Typography>
-          <Button variant="contained" onClick={ handleOpen } startIcon={<Iconify icon="eva:plus-fill" />}>
-            New Product
-          </Button>
+          { userTypeId < 2 &&
+            <Button variant="contained" onClick={ handleOpen } startIcon={<Iconify icon="eva:plus-fill" />}>
+              New Product
+            </Button>
+          }
           {/* Add product */}
           <Modal
             open={open}
@@ -318,6 +383,37 @@ export default function Product() {
                         </Grid>
                         <Grid item xs={12} sm={3}></Grid>
                       </Grid>
+                      <Grid item container spacing={2}>
+                        <Grid item xs={12} sm={6}>
+                          <FormControl sx={{ width: 1 }}>
+                            <InputLabel id="store-select">Store</InputLabel>
+                            <Select
+                              labelId="store-select"
+                              id="store-select"
+                              name="store_id"
+                              value={setCurrentProduct.store_id}
+                              label="Product type"
+                              onChange={(event) => {
+                                setCurrentProduct({...currentProduct, 'store_id':event.target.value})}
+                              } 
+                            >
+                              {storeList.map((item, key)=>{
+                                return(
+                                  <MenuItem key={key} value={key}>{sentenceCase(item.name)}</MenuItem>
+                                )
+                              })}
+                            </Select>
+                          </FormControl>
+                        </Grid>
+                        <Grid item xs={12} sm={6} >
+                          <TextField
+                            name="qty"
+                            fullWidth
+                            id="qty"
+                            label="Quantity"
+                          />
+                        </Grid>
+                      </Grid>
                     </Grid>
                     <Button
                       type="submit"
@@ -355,7 +451,33 @@ export default function Product() {
                   </Typography>
                   <Box component="form" noValidate onSubmit={handleQtySubmit} sx={{ mt: 3 }} style={{ width:"100%", textAlign:"center" }}>
                     <Grid container spacing={2} style={{ justifyContent: "center" }}>
-                      <Grid item xs={6} sm={6}>
+                      { userTypeId === 0 && 
+                        <Grid container sx={{ mt: 3 }} style={{ justifyContent: "center" }}>
+                          <Grid item xs={12} sm={6}>
+                            <FormControl sx={{ width: 1 }}>
+                              <InputLabel id="store-select">Store</InputLabel>
+                              <Select
+                                labelId="store-select"
+                                id="store-select"
+                                name="store_id"
+                                value={currentStore}
+                                label="Product type"
+                                onChange={(event) => {
+                                  setCurrentStore(event.target.value)}
+                                } 
+                              >
+                                {storeList.map((item, key)=>{
+                                  return(
+                                    <MenuItem key={key} value={item.id}>{sentenceCase(item.name)}</MenuItem>
+                                  )
+                                })}
+                              </Select>
+                            </FormControl>
+                          </Grid>
+                        </Grid>
+                      }
+                      <AddFile onFileChange={handlerFileChange} />
+                      <Grid item xs={12} sm={6}>
                         <Input 
                           type="number"
                           name="qty"
@@ -385,7 +507,7 @@ export default function Product() {
         </Stack>
 
         <Card>
-          <ProductListToolbar numSelected={selected.length} onFilterName={handleFilterByName} onDelete={handleDelete} />
+          <ProductListToolbar numSelected={selected.length} onFilterName={handleFilterByName} storeList={storeList} onStore={handleStore} currentStore={currentStore} onDelete={handleDelete} />
           <TableContainer sx={{ minWidth: 800 }}>
             <Table>
               <ProductListHead

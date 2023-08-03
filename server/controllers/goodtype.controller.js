@@ -4,7 +4,7 @@ class GoodTypeController {
   async createGoodType(req, res){
     // save to DB
     const { product_type } = req.body;
-    console.log('add product_type:', product_type);
+    // console.log('add product_type:', product_type);
 
     const goodType = await DB.query(`SELECT * FROM product_types WHERE product_type = $1`, [product_type]);
     // console.log('already exists store:', goodType);
@@ -60,7 +60,7 @@ class GoodTypeController {
 
   async deleteGoodType(req, res){
     const id = req.params.id
-    console.log('delete product_type by ID:', id)
+    // console.log('delete product_type by ID:', id)
     // const sql = `DELETE FROM product_types WHERE id = $1 RETURNING *;`
     const sql =`UPDATE product_types SET archive = true WHERE id = $1;`    
     const productTypeDeleted = await DB.query(sql, [id])

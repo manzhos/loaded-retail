@@ -1,8 +1,8 @@
 // assets
-import { IconDashboard } from '@tabler/icons';
+import { IconDashboard, IconBrandStackoverflow } from '@tabler/icons';
 
 // constant
-const icons = { IconDashboard };
+const icons = { IconDashboard, IconBrandStackoverflow };
 
 // ==============================|| DASHBOARD MENU ITEMS ||============================== //
 
@@ -11,13 +11,23 @@ const dashboard = {
   title: 'Dashboard',
   type: 'group',
   children: [
+    // {
+    //   id: 'default',
+    //   title: 'Dashboard',
+    //   type: 'item',
+    //   url: '/dashboard/default',
+    //   icon: icons.IconDashboard,
+    //   breadcrumbs: false,
+    //   permission: 0
+    // },
     {
-      id: 'default',
-      title: 'Dashboard',
+      id: 'flow',
+      title: 'Product Flow',
       type: 'item',
-      url: '/dashboard/default',
-      icon: icons.IconDashboard,
-      breadcrumbs: false
+      url: '/dashboard/flow',
+      icon: icons.IconBrandStackoverflow,
+      breadcrumbs: false,
+      permission: 0
     },
     // {
     //   id: 'login',

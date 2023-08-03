@@ -6,9 +6,9 @@ const jwt = require('jsonwebtoken');
 class UserController { 
 
   async loginUser(req, res){
-    console.log('try login')
+    // console.log('try login')
     const {email, password} = req.body
-    console.log('data:', email, password)
+    // console.log('data:', email, password)
     try {
       let q = await DB.query(`SELECT * FROM users WHERE email = $1`, [email])
       const user = q.rows[0]
@@ -26,7 +26,7 @@ class UserController {
         { expiresIn: exp }
       )
       user.password = 'fuckYou';
-      console.log('user:', user);
+      // console.log('user:', user);
       res.json({ token, user:user })
     } catch (e) {
       res.status(500).json({ message: 'Something wrong' })
@@ -36,7 +36,7 @@ class UserController {
   async createUser(req, res){
     // console.log('try create user');
     // save to DB
-    const { firstname, lastname, email, phone, usertype_id, password } = req.body;
+    const { firstname, lastname, email, phone, usertype_id, store_id, password } = req.body;
 
     const user = await DB.query(`SELECT * FROM users WHERE email = $1`, [email]);
     console.log('already exists user:', user);
@@ -44,12 +44,12 @@ class UserController {
       return res.status(400).json({ message: 'Same user already exist' });
     }
 
-    const sql = 'INSERT INTO users (firstname, lastname, email, phone, usertype_id, password, ts) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *';
+    const sql = 'INSERT INTO users (firstname, lastname, email, phone, usertype_id, store_id, password, ts) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *';
     let ts = new Date();
     const hashedPassword = await bcrypt.hash(password, 12);
-    console.log('add user:', firstname, lastname, email, phone, usertype_id, hashedPassword, ts);
+    // console.log('add user:', firstname, lastname, email, phone, usertype_id, store_id, hashedPassword, ts);
     try{
-      const newUser = await DB.query(sql, [firstname, lastname, email, phone, usertype_id, hashedPassword, ts]);
+      const newUser = await DB.query(sql, [firstname, lastname, email, phone, usertype_id, store_id, hashedPassword, ts]);
       // console.log('new user', newUser.rows[0]);
       return res.send(newUser.rows[0]);
     } catch (err) {
@@ -72,10 +72,10 @@ class UserController {
   }
 
   async updateUser(req, res){
-    // update data
+    // console.log('update data');
     const id = req.params.id
-    const { firstname, lastname, email, phone, usertype_id, password } = req.body;
-    // console.log('update user:', firstname, lastname, email, phone, usertype_id, password);
+    const { firstname, lastname, email, phone, usertype_id, store_id, password } = req.body;
+    // console.log('update user:', firstname, lastname, email, phone, usertype_id, store_id, password);
     const oldUser = await DB.query(` SELECT password FROM users WHERE id = $1`, [id]);
     // const hashedPassword = await bcrypt.hash(password, 12)
     let hashedPassword = oldUser.rows[0].password;
@@ -90,10 +90,11 @@ class UserController {
           email       = $4, 
           phone       = $5, 
           usertype_id = $6,
-          password    = $7
+          store_id    = $7,
+          password    = $8
         WHERE id = $1 
         RETURNING *
-      `, [id, firstname, lastname, email, phone, usertype_id, hashedPassword]);
+      `, [id, firstname, lastname, email, phone, usertype_id, Number(store_id), hashedPassword]);
       return res.send(user.rows[0]);
     } catch (err) {
       console.log(`Error: ${err}`)  

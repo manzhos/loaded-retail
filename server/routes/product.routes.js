@@ -9,4 +9,6 @@ router.patch('/product/:id',    productController.updateProduct)
 router.patch('/qtyproduct/:id', productController.updateQtyProduct)
 router.get('/delproduct/:id',   productController.deleteProduct)
 
+router.get('/productflow',      productController.getProductsFlow)
+
 module.exports = router 

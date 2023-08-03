@@ -19,10 +19,10 @@ import {
   Select,
  } from '@mui/material';
 // component
-// import { AuthContext } from '../../../context/AuthContext'
-import Iconify from '../../../ui-component/Iconify';
-import { useHttp } from '../../../hooks/http.hook'
-import config from '../../../config';
+// import { AuthContext } from 'context/AuthContext'
+import Iconify from 'ui-component/Iconify';
+import { useHttp } from 'hooks/http.hook'
+import config from 'config';
 
 // ----------------------------------------------------------------------
 
@@ -59,7 +59,7 @@ export default function ProductMoreMenu({ id, product = {}, productTypeList = []
   const handleSaveChanges = async (event) => {
     event.preventDefault()
     const data = new FormData(event.currentTarget)
-    console.log('product:', data.get('product'))
+    // console.log('product:', data.get('product'))
     try {
       const updProduct = await request(`${config.API_URL}api/product/${product.id}`, 'PATCH', {
         product:        data.get('product'),

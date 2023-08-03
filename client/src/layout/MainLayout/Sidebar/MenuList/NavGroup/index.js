@@ -1,3 +1,4 @@
+import { useContext } from 'react';
 import PropTypes from 'prop-types';
 
 // material-ui
@@ -8,24 +9,32 @@ import { Divider, List, Typography } from '@mui/material';
 import NavItem from '../NavItem';
 import NavCollapse from '../NavCollapse';
 
+import { AuthContext } from 'context/AuthContext';
+
 // ==============================|| SIDEBAR MENU LIST GROUP ||============================== //
 
 const NavGroup = ({ item }) => {
   const theme = useTheme();
+  const { userId, token, userTypeId } = useContext(AuthContext);
+  // console.log('userTypeId:', userTypeId);
+  // console.log('token:', token);
+  // console.log('userId:', userId);
 
   // menu list collapse & items
   const items = item.children?.map((menu) => {
-    switch (menu.type) {
-      case 'collapse':
-        return <NavCollapse key={menu.id} menu={menu} level={1} />;
-      case 'item':
-        return <NavItem key={menu.id} item={menu} level={1} />;
-      default:
-        return (
-          <Typography key={menu.id} variant="h6" color="error" align="center">
-            Menu Items Error
-          </Typography>
-        );
+    if(menu.permission >= userTypeId){
+      switch (menu.type) {
+        case 'collapse':
+          return <NavCollapse key={menu.id} menu={menu} level={1} />;
+        case 'item':
+          return <NavItem key={menu.id} item={menu} level={1} />;
+        default:
+          return (
+            <Typography key={menu.id} variant="h6" color="error" align="center">
+              Menu Items Error
+            </Typography>
+          );
+      }
     }
   });
 

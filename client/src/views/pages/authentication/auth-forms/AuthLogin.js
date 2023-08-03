@@ -29,9 +29,9 @@ import AnimateButton from 'ui-component/extended/AnimateButton';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
-import { AuthContext } from '../../../../context/AuthContext'
-import { useHttp } from '../../../../hooks/http.hook'
-import config from '../../../../config';
+import { AuthContext } from 'context/AuthContext'
+import { useHttp } from 'hooks/http.hook'
+import config from 'config';
 
 const Login = (others) => {
   const theme = useTheme();
@@ -58,7 +58,7 @@ const Login = (others) => {
         password:   values.password,
       })
       // console.log('res', res);
-      auth.login(res.token, res.user.id)
+      auth.login(res.token, res.user.id, res.user.usertype_id, res.user.store_id);
     } catch (err) {
       console.error(err);
     }
