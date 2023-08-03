@@ -30,6 +30,8 @@ app.use(session({
   secret: 'SECRET' 
 }));
 
+app.get('/test', (req, res) => res.send('Hello World'));
+
 app.use(express.json({ extended: true }))
 app.use('/api', require('./routes/user.routes'))
 app.use('/api', require('./routes/store.routes'))
