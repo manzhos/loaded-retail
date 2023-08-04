@@ -5,12 +5,13 @@ require('dotenv').config()
 
 class FileController {
   async uploadFile(req, res){
+    console.log('take & save the file');
     if(!req.files) return res.status(400).json({message: 'Reload please'});
     
     const folderName = process.env.filePath + '/photos';
     try {
       if(!fs.existsSync(folderName)) {
-        // console.log('Try to make dir:', folderName);
+        console.log('Try to make dir:', folderName);
         fs.mkdirSync(folderName);
       }
     } catch (err) { console.error(err) }
