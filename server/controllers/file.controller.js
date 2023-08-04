@@ -45,8 +45,8 @@ class FileController {
         if (fs.existsSync(pathFile)) {
           return res.status(400).json({message: 'File already exist'});
         }
-        file[key].mv(pathFile[key]);
-        // console.log('file was saved');
+        const savedFile = file[key].mv(pathFile[key]);
+        // console.log('file was saved:', savedFile);
   
         // add file to DB
         const sql = 'INSERT INTO files (filename, type, size, path, ts) VALUES ($1, $2, $3, $4, $5) RETURNING *';
