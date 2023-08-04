@@ -40,8 +40,8 @@ class FileController {
         fileName[key] = uuid.v4() + '_' + file[key].name;
         // console.log('File:', file[key]);
         // console.log('fileName:', fileName[key]);
-        pathFile[key] = folderName + '/' + fileName[key];
-        // console.log('\nPath:', folderName, pathFile[key]);
+        pathFile[key] = folderName + '/' + subFolderName + '/' + fileName[key];
+        // console.log('\nPath:', folderName + '/' + subFolderName, pathFile[key]);
         if (fs.existsSync(pathFile)) {
           return res.status(400).json({message: 'File already exist'});
         }
@@ -52,8 +52,8 @@ class FileController {
         const sql = 'INSERT INTO files (filename, type, size, path, ts) VALUES ($1, $2, $3, $4, $5) RETURNING *';
         const ts = new Date();
         const type = file[key].name.split('.').pop();
-        // console.log('for DB:\n', fileName, type, file.size, folderName, ts)    ;
-        const newFile = await DB.query(sql, [fileName[key], type, file[key].size, folderName, ts]);
+        // console.log('for DB:\n', fileName, type, file.size, folderName + '/' + subFolderName, ts)    ;
+        const newFile = await DB.query(sql, [fileName[key], type, file[key].size, folderName + '/' + subFolderName, ts]);
         // console.log('newFile:', newFile.rows[0]);
         newFiles.push(newFile.rows[0]);
     }

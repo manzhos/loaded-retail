@@ -18,9 +18,9 @@ const URL      = process.env.URL
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.raw());
-app.use(bodyParser.urlencoded({ extended: true }))
+app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use(fileUpload({}))
+app.use(fileUpload({}));
 
 app.set('view engine', 'ejs');
 
@@ -32,18 +32,19 @@ app.use(session({
 
 app.get('/test', (req, res) => res.send('Hello World'));
 
-app.use(express.json({ extended: true }))
-app.use('/api', require('./routes/user.routes'))
-app.use('/api', require('./routes/store.routes'))
-app.use('/api', require('./routes/product.routes'))
-app.use('/api', require('./routes/goodtype.routes'))
+app.use(express.json({ extended: true }));
+app.use('/api', require('./routes/user.routes'));
+app.use('/api', require('./routes/store.routes'));
+app.use('/api', require('./routes/product.routes'));
+app.use('/api', require('./routes/goodtype.routes'));
 
-app.use('/api', require('./routes/file.routes'))
-app.use(express.static('files'))
+app.use('/api', require('./routes/file.routes'));
+
+app.use('/files',express.static('./files'));
 
 
 // start server
 async function start() {
-  app.listen(PORT, () => console.log(`App has been started on port ${PORT}...`))
+  app.listen(PORT, () => console.log(`App has been started on port ${PORT}...`));
 }
-start()
+start();
