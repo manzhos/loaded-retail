@@ -15,43 +15,43 @@ class FileController {
       }
     } catch (err) { console.error(err) }
     
-    try{
-      let file = []
-      if(req.files.file.length && req.files.file.length > 0) file = req.files.file;
-      else file.push(req.files.file);
-      // console.log('file[]', file);
-      let fileName = [],
-          pathFile = [],
-          newFiles = [];
+    // try{
+    //   let file = []
+    //   if(req.files.file.length && req.files.file.length > 0) file = req.files.file;
+    //   else file.push(req.files.file);
+    //   // console.log('file[]', file);
+    //   let fileName = [],
+    //       pathFile = [],
+    //       newFiles = [];
   
-      // save the file
-      for(let key in file){
-        fileName[key] = uuid.v4() + '_' + file[key].name;
-        // console.log('File:', file[key]);
-        // console.log('fileName:', fileName[key]);
-        pathFile[key] = folderName + '/' + fileName[key];
-        // console.log('\nPath:', folderName, pathFile[key]);
-        if (fs.existsSync(pathFile)) {
-          return res.status(400).json({message: 'File already exist'});
-        }
-        file[key].mv(pathFile[key]);
-        // console.log('file was saved');
+    //   // save the file
+    //   for(let key in file){
+    //     fileName[key] = uuid.v4() + '_' + file[key].name;
+    //     // console.log('File:', file[key]);
+    //     // console.log('fileName:', fileName[key]);
+    //     pathFile[key] = folderName + '/' + fileName[key];
+    //     // console.log('\nPath:', folderName, pathFile[key]);
+    //     if (fs.existsSync(pathFile)) {
+    //       return res.status(400).json({message: 'File already exist'});
+    //     }
+    //     file[key].mv(pathFile[key]);
+    //     // console.log('file was saved');
   
-        // add file to DB
-        const sql = 'INSERT INTO files (filename, type, size, path, ts) VALUES ($1, $2, $3, $4, $5) RETURNING *';
-        const ts = new Date();
-        const type = file[key].name.split('.').pop();
-        // console.log('for DB:\n', fileName, type, file.size, folderName, ts)    ;
-        const newFile = await DB.query(sql, [fileName[key], type, file[key].size, folderName, ts]);
-        // console.log('newFile:', newFile.rows[0]);
-        newFiles.push(newFile.rows[0]);
-      }
-      // console.log('newFiles:', newFiles)
-      res.send(newFiles)
-    } catch (err) { 
-      console.error('Error:', err);
-      return res.status(500).json({message:"Upload error"});
-    }
+    //     // add file to DB
+    //     const sql = 'INSERT INTO files (filename, type, size, path, ts) VALUES ($1, $2, $3, $4, $5) RETURNING *';
+    //     const ts = new Date();
+    //     const type = file[key].name.split('.').pop();
+    //     // console.log('for DB:\n', fileName, type, file.size, folderName, ts)    ;
+    //     const newFile = await DB.query(sql, [fileName[key], type, file[key].size, folderName, ts]);
+    //     // console.log('newFile:', newFile.rows[0]);
+    //     newFiles.push(newFile.rows[0]);
+    //   }
+    //   // console.log('newFiles:', newFiles)
+    //   res.send(newFiles)
+    // } catch (err) { 
+    //   console.error('Error:', err);
+    //   return res.status(500).json({message:"Upload error"});
+    // }
   }
 
   async getFiles(req, res){
