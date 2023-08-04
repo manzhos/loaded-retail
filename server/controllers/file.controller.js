@@ -7,7 +7,7 @@ class FileController {
   async uploadFile(req, res){
     if(!req.files) return res.status(400).json({message: 'Reload please'});
     
-    const folderName = process.env.filePath + '\\photos';
+    const folderName = process.env.filePath + '/photos';
     try {
       if(!fs.existsSync(folderName)) {
         // console.log('Try to make dir:', folderName);
@@ -29,7 +29,7 @@ class FileController {
         fileName[key] = uuid.v4() + '_' + file[key].name;
         // console.log('File:', file[key]);
         // console.log('fileName:', fileName[key]);
-        pathFile[key] = folderName + '\\' + fileName[key];
+        pathFile[key] = folderName + '/' + fileName[key];
         // console.log('\nPath:', folderName, pathFile[key]);
         if (fs.existsSync(pathFile)) {
           return res.status(400).json({message: 'File already exist'});

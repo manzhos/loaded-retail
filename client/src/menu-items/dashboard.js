@@ -27,7 +27,7 @@ const dashboard = {
       url: '/dashboard/flow',
       icon: icons.IconBrandStackoverflow,
       breadcrumbs: false,
-      permission: 0
+      permission: 2
     },
     // {
     //   id: 'login',

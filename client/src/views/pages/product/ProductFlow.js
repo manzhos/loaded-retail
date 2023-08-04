@@ -284,7 +284,7 @@ export default function Product() {
                       </TableCell>
                       <TableCell component="th" scope="row" padding="normal" onClick={() => fullScreenImg(path, filename)}>
                         <Stack direction="row" alignItems="center" spacing={2}>
-                          {filename && <img src={path + '\\' + filename} style={{ maxHeight:"100px" }} />}
+                          {filename && <img src={path + '/' + filename} style={{ maxHeight:"100px" }} />}
                         </Stack>
                       </TableCell>
                       {/* <TableCell align="right">

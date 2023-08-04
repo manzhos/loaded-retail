@@ -14,12 +14,12 @@ class ProductController {
     const sqlProd = 'INSERT INTO products (product, producttype_id, cost, ts) VALUES ($1, $2, $3, $4) RETURNING *';
     const sqlFlow = `INSERT INTO product_store_flow (product_id, store_id, qty, user_id, ts) VALUES ($1, $2, $3, $4, $5) RETURNING *`
     let ts = new Date();
-    // console.log('add product:', product, producttype_id, cost, ts);
+    console.log('add product:', product, producttype_id, cost, ts);
 
 
     try{
       const newProduct = await DB.query(sqlProd, [product, producttype_id, cost, ts]);
-      // console.log('new Product', newProduct.rows[0]);
+      console.log('new Product', newProduct.rows[0]);
       let flowProduct;
       if(newProduct && newProduct.rows && newProduct.rows[0].id) flowProduct = await DB.query(sqlFlow, [newProduct.rows[0].id, store_id, qty, user_id, ts]);
 

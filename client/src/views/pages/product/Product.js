@@ -216,6 +216,7 @@ export default function Product() {
     //   data.get('product'), '\n',
     //   data.get('producttype_id'), '\n',
     //   data.get('cost'), '\n',
+    //   data.get('store_id'), '\n',
     // )
     if(!data.get('cost').match(/^[0-9]+$/)){
       alert('The cost must be a number.');
@@ -228,7 +229,7 @@ export default function Product() {
           product:        data.get('product'),
           producttype_id: data.get('producttype_id'),
           cost:           data.get('cost'),
-          store_id:       data.get('store_id'),
+          store_id:       userTypeId < 1 ? data.get('store_id') : storeId,
           qty:            data.get('qty'),
           user_id:        userId,
         })
@@ -339,6 +340,34 @@ export default function Product() {
                   </Typography>
                   <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }} style={{ width:"100%", textAlign:"center" }}>
                     <Grid container spacing={2}>
+                      <Grid item xs={12} sm={12} sx={{ mb:2 }}>
+                        { userTypeId < 1 ? (
+                            <FormControl sx={{ width: 1 }}>
+                              <InputLabel id="store-select">Store</InputLabel>
+                              <Select
+                                labelId="store-select"
+                                id="store-select"
+                                name="store_id"
+                                value={currentProduct.store_id}
+                                label="Product type"
+                                onChange={(event) => {
+                                  setCurrentProduct({...currentProduct, 'store_id':event.target.value})}
+                                } 
+                              >
+                                {storeList.map((item, key)=>{
+                                  return(
+                                    <MenuItem key={key} value={item.id}>{sentenceCase(item.name)}</MenuItem>
+                                  )
+                                })}
+                              </Select>
+                            </FormControl>
+                          ) : (
+                            <Typography component="div" variant="h3">
+                              Store {storeList.find(s => s.id === storeId)?.name}
+                            </Typography>
+                          )
+                        }
+                      </Grid>
                       <Grid item xs={12} sm={12} >
                         <TextField
                           autoComplete="product"
@@ -351,27 +380,26 @@ export default function Product() {
                           autoFocus
                         />
                       </Grid>
-                      <Grid item xs={12} sm={12}>
-                        <FormControl sx={{ width: 1 }}>
-                          <InputLabel id="product-select">Product type</InputLabel>
-                          <Select
-                            labelId="product-select"
-                            id="product-select"
-                            name="producttype_id"
-                            value={productTypeId}
-                            label="Product type"
-                            onChange={(event) => {setProductTypeId(event.target.value)}} 
-                          >
-                            {productTypeList.map((item, key)=>{
-                              return(
-                                <MenuItem key={key} value={item.id}>{sentenceCase(item.product_type)}</MenuItem>
-                              )
-                            })}
-                          </Select>
-                        </FormControl>
-                      </Grid>
-                      <Grid item container>
-                        <Grid item xs={12} sm={3}></Grid>
+                      <Grid container spacing={2} item xs={12} sm={12}>
+                        <Grid item xs={12} sm={6}>
+                          <FormControl sx={{ width: 1 }}>
+                            <InputLabel id="product-select">Product type</InputLabel>
+                            <Select
+                              labelId="product-select"
+                              id="product-select"
+                              name="producttype_id"
+                              value={productTypeId}
+                              label="Product type"
+                              onChange={(event) => {setProductTypeId(event.target.value)}} 
+                            >
+                              {productTypeList.map((item, key)=>{
+                                return(
+                                  <MenuItem key={key} value={item.id}>{sentenceCase(item.product_type)}</MenuItem>
+                                )
+                              })}
+                            </Select>
+                          </FormControl>
+                        </Grid>
                         <Grid item xs={12} sm={6} >
                           <TextField
                             name="cost"
@@ -381,30 +409,10 @@ export default function Product() {
                             defaultValue={currentProduct.cost}
                           />
                         </Grid>
-                        <Grid item xs={12} sm={3}></Grid>
                       </Grid>
+                      {/* <AddFile onFileChange={handlerFileChange} /> */}
                       <Grid item container spacing={2}>
-                        <Grid item xs={12} sm={6}>
-                          <FormControl sx={{ width: 1 }}>
-                            <InputLabel id="store-select">Store</InputLabel>
-                            <Select
-                              labelId="store-select"
-                              id="store-select"
-                              name="store_id"
-                              value={setCurrentProduct.store_id}
-                              label="Product type"
-                              onChange={(event) => {
-                                setCurrentProduct({...currentProduct, 'store_id':event.target.value})}
-                              } 
-                            >
-                              {storeList.map((item, key)=>{
-                                return(
-                                  <MenuItem key={key} value={key}>{sentenceCase(item.name)}</MenuItem>
-                                )
-                              })}
-                            </Select>
-                          </FormControl>
-                        </Grid>
+                        <Grid item xs={12} sm={3}></Grid>
                         <Grid item xs={12} sm={6} >
                           <TextField
                             name="qty"
@@ -413,13 +421,14 @@ export default function Product() {
                             label="Quantity"
                           />
                         </Grid>
+                        <Grid item xs={12} sm={3}></Grid>
                       </Grid>
                     </Grid>
                     <Button
                       type="submit"
                       // fullWidth
                       variant="contained"
-                      sx={{ mt: 3, mb: 2 }}
+                      sx={{ mt: 5, mb: 2 }}
                       style={{ padding:"8px 40px 5px"}}
                     >
                       Save

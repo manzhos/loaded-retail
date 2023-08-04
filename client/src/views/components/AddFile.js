@@ -60,7 +60,6 @@ export default function AddFile({ onFileChange }){
           {/* {fileURL.map(item => console.log('item:', item))} */}
           {}
         </div>
-        {console.log('fileURL', fileURL)}
         { !fileURL.length ? (
           <label htmlFor="file" style={{ width:'100%' }}>
             <input id="file" name="file" type="file" onChange={handlerFileChange} style={{ display: "none" }}/>
